@@ -131,6 +131,17 @@ func TestResultErrorPool(t *testing.T) {
 		}
 	})
 
+	t.Run("results after last error are preserved", func(t *testing.T) {
+		t.Parallel()
+		g := pool.NewWithResults[int]().WithErrors()
+		g.Go(func() (int, error) { return 1, nil })
+		g.Go(func() (int, error) { return 2, err1 })
+		g.Go(func() (int, error) { return 3, nil })
+		res, err := g.Wait()
+		require.ErrorIs(t, err, err1)
+		require.Equal(t, []int{1, 3}, res)
+	})
+
 	t.Run("reuse", func(t *testing.T) {
 		// Test for https://github.com/sourcegraph/conc/issues/128
 		p := pool.NewWithResults[int]().WithErrors()
