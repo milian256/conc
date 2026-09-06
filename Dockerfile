@@ -6,3 +6,4 @@ RUN pip install --no-cache-dir aider-chat
 RUN git config --global --add safe.directory /workspace
 COPY . /workspace
 WORKDIR /workspace
+RUN go mod download
